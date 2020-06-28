@@ -1,6 +1,7 @@
 package cn.worken.auth.security;
 
 
+import cn.worken.auth.service.ClientDetailsServiceAdaptImpl;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,37 +55,28 @@ public class OAuth2ServerConfig {
 
         private final AuthenticationManager authenticationManager;
         private final PasswordEncoder passwordEncoder;
+        private final ClientDetailsServiceAdaptImpl clientDetailsServiceAdapt;
 
         public AuthorizationServerConfiguration(AuthenticationManager authenticationManager,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            ClientDetailsServiceAdaptImpl clientDetailsServiceAdapt) {
             this.authenticationManager = authenticationManager;
             this.passwordEncoder = passwordEncoder;
+            this.clientDetailsServiceAdapt = clientDetailsServiceAdapt;
         }
 
 
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            //配置两个客户端,一个用于password认证一个用于client认证
-            clients
-                .inMemory().withClient("client_1")
-                .resourceIds(DEMO_RESOURCE_ID)
-                .authorizedGrantTypes("client_credentials", "refresh_token")
-                .scopes("select")
-                .authorities("oauth2")
-                .secret(passwordEncoder.encode("123456"))
-                .and()
-                .withClient("client_2")
-                .resourceIds(DEMO_RESOURCE_ID)
-                .authorizedGrantTypes("password", "refresh_token")
-                .scopes("select")
-                .authorities("oauth2")
-                .secret(passwordEncoder.encode("123456"));
+            // 手动配置
+            clients.withClientDetails(clientDetailsServiceAdapt);
         }
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
             endpoints
                 .tokenStore(new InMemoryTokenStore())
+                // password 登陆方式鉴权
                 .authenticationManager(authenticationManager)
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         }

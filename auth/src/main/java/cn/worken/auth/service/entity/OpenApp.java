@@ -2,7 +2,8 @@ package cn.worken.auth.service.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +20,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class OpenApp implements Serializable {
+public class OpenApp extends Model<OpenApp> {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
@@ -76,5 +77,11 @@ public class OpenApp implements Serializable {
      */
     private Boolean status;
 
+
+    public static OpenApp getByClientId(String clientId) {
+        QueryWrapper<OpenApp> qw = new QueryWrapper<>();
+        qw.eq("app_key", clientId).eq("status", 1);
+        return new OpenApp().selectOne(qw);
+    }
 
 }
