@@ -30,3 +30,5 @@ management:
       exposure:
         include: "*"
 logging.level.org.springframework.security: DEBUG
+center-common:
+  enable-exception-handler: fasle

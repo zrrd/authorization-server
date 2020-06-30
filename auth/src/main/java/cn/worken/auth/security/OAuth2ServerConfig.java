@@ -1,12 +1,14 @@
 package cn.worken.auth.security;
 
 
-import cn.worken.auth.service.ClientDetailsServiceAdaptImpl;
+import java.util.Map;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -15,7 +17,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 /**
  * @author 徐靖峰 Date 2018-04-19
@@ -74,13 +79,11 @@ public class OAuth2ServerConfig {
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-            endpoints
-                .tokenStore(new InMemoryTokenStore())
+            endpoints.accessTokenConverter(jwtAccessTokenConverter())
                 // password 登陆方式鉴权
                 .authenticationManager(authenticationManager)
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         }
-
 
 
         @Override
@@ -89,6 +92,21 @@ public class OAuth2ServerConfig {
             oauthServer.allowFormAuthenticationForClients();
         }
 
+
+        @Bean
+        public JwtAccessTokenConverter jwtAccessTokenConverter() {
+            JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
+            // 自定义生成签名的key
+            accessTokenConverter.setSigningKey("hello");
+            // 自定义生成的签名
+            accessTokenConverter.setAccessTokenConverter(new DefaultAccessTokenConverter(){
+                @Override
+                public Map<String, ?> convertAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
+                    return super.convertAccessToken(token, authentication);
+                }
+            });
+            return accessTokenConverter;
+        }
     }
 
 }

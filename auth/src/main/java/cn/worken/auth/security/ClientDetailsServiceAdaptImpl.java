@@ -1,4 +1,4 @@
-package cn.worken.auth.service;
+package cn.worken.auth.security;
 
 import cn.worken.auth.service.dto.CustomClientDetails;
 import cn.worken.auth.service.entity.OpenApp;
