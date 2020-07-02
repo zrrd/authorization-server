@@ -1,12 +1,15 @@
 package cn.worken.auth.security;
 
 
+import java.util.Base64;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -20,13 +23,12 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 /**
- * @author 徐靖峰 Date 2018-04-19
+ * @author shaoyijiong
  */
 @Configuration
-public class OAuth2ServerConfig {
+public class OAuthServerConfig {
 
     private static final String DEMO_RESOURCE_ID = "order";
 
@@ -52,6 +54,15 @@ public class OAuth2ServerConfig {
     }
 
     /**
+     * 密码加密方式
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+    /**
      * 认证服务器配置
      */
     @Configuration
@@ -59,14 +70,11 @@ public class OAuth2ServerConfig {
     protected static class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
         private final AuthenticationManager authenticationManager;
-        private final PasswordEncoder passwordEncoder;
         private final ClientDetailsServiceAdaptImpl clientDetailsServiceAdapt;
 
         public AuthorizationServerConfiguration(AuthenticationManager authenticationManager,
-            PasswordEncoder passwordEncoder,
             ClientDetailsServiceAdaptImpl clientDetailsServiceAdapt) {
             this.authenticationManager = authenticationManager;
-            this.passwordEncoder = passwordEncoder;
             this.clientDetailsServiceAdapt = clientDetailsServiceAdapt;
         }
 
@@ -82,6 +90,9 @@ public class OAuth2ServerConfig {
             endpoints.accessTokenConverter(jwtAccessTokenConverter())
                 // password 登陆方式鉴权
                 .authenticationManager(authenticationManager)
+                .exceptionTranslator(e -> {
+                    throw e;
+                })
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         }
 
@@ -92,14 +103,16 @@ public class OAuth2ServerConfig {
             oauthServer.allowFormAuthenticationForClients();
         }
 
+        @Value("${jwt-secret-key}")
+        private String stringKey;
 
         @Bean
         public JwtAccessTokenConverter jwtAccessTokenConverter() {
             JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
             // 自定义生成签名的key
-            accessTokenConverter.setSigningKey("hello");
+            accessTokenConverter.setSigningKey(new String(Base64.getDecoder().decode(stringKey)));
             // 自定义生成的签名
-            accessTokenConverter.setAccessTokenConverter(new DefaultAccessTokenConverter(){
+            accessTokenConverter.setAccessTokenConverter(new DefaultAccessTokenConverter() {
                 @Override
                 public Map<String, ?> convertAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
                     return super.convertAccessToken(token, authentication);

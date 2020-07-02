@@ -2,7 +2,8 @@ package cn.worken.auth.service.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,8 +20,8 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SysUser implements Serializable {
-    
+public class SysUser extends Model<SysUser> {
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -107,12 +108,19 @@ public class SysUser implements Serializable {
     /**
      * 1-正常 0-暂停 2-审核  9 删除
      */
-    private Boolean status;
+    private Integer status;
 
     /**
      * 所属产品
      */
     private String productId;
 
+    public static SysUser loadUserByUsername(String username) {
+        SysUser sysUser = new SysUser();
+        sysUser.setLoginName(username);
+        sysUser.setStatus(1);
+        QueryWrapper<SysUser> qw = new QueryWrapper<>(sysUser);
+        return new SysUser().selectOne(qw);
+    }
 
 }

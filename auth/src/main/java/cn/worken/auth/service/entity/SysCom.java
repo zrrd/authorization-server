@@ -1,5 +1,6 @@
 package cn.worken.auth.service.entity;
 
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -17,7 +18,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SysCom implements Serializable {
+public class SysCom extends Model<SysCom> {
 
 
     /**
@@ -68,7 +69,6 @@ public class SysCom implements Serializable {
     /**
      * 状态 0 禁用 1 启用  9 伪删除
      */
-    private Boolean status;
-
+    private Integer status;
 
 }

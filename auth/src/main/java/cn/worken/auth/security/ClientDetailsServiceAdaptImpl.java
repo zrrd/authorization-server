@@ -8,10 +8,11 @@ import java.util.Optional;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.security.oauth2.provider.NoSuchClientException;
 import org.springframework.stereotype.Component;
 
 /**
- * client 配置
+ * client 校验 配置
  *
  * @author shaoyijiong
  * @date 2020/6/28
@@ -22,6 +23,9 @@ public class ClientDetailsServiceAdaptImpl implements ClientDetailsService {
     @Override
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
         OpenApp client = OpenApp.getByClientId(clientId);
+        if (client == null) {
+            throw new NoSuchClientException(clientId);
+        }
         CustomClientDetails clientDetails = new CustomClientDetails();
         clientDetails.setClientId(client.getAppKey());
         clientDetails.setClientSecret(client.getAppSecret());

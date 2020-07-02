@@ -1,17 +1,15 @@
 package cn.worken.auth.security;
 
 
+import com.google.common.collect.ImmutableList;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
  * @author 徐靖峰 Date 2018-04-19
@@ -20,21 +18,27 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    /**
-     * 密码加密方式
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    private final UserDetailsServiceImpl userDetailsService;
+    private final UserProvider userProvider;
+
+    public SecurityConfiguration(UserDetailsServiceImpl userDetailsService,
+        UserProvider userProvider) {
+        this.userDetailsService = userDetailsService;
+        this.userProvider = userProvider;
+    }
+
+    @Override
+    public UserDetailsService userDetailsServiceBean() {
+        return userDetailsService;
     }
 
     /**
-     * 这一步的配置是必不可少的，否则SpringBoot会自动配置一个AuthenticationManager,覆盖掉内存中的用户
+     * 校验用户"账户密码"
      */
     @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManagerBean() {
+        return new ProviderManager(ImmutableList.of(userProvider));
     }
 
     @Override

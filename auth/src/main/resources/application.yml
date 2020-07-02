@@ -30,5 +30,5 @@ management:
       exposure:
         include: "*"
 logging.level.org.springframework.security: DEBUG
-center-common:
-  enable-exception-handler: fasle
+# jwt 加密key
+jwt-secret-key: KmReSFdkIVZYd2VwZjVqaHVYUmIlTXpIcm5HSzgldXM=
