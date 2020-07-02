@@ -1,6 +1,8 @@
 package cn.worken.auth.security;
 
 import cn.worken.auth.security.dto.LoginParam;
+import cn.worken.auth.security.dto.LoginUserInfo;
+import java.util.Collections;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,8 +27,8 @@ public class UserProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         LoginParam loginParam = LoginParam.getLoginParamWithRequest(authentication);
-        userDetailsService.login(loginParam);
-        return authentication;
+        LoginUserInfo userInfo = userDetailsService.login(loginParam);
+        return new UsernamePasswordAuthenticationToken(userInfo, null, Collections.emptyList());
     }
 
     @Override

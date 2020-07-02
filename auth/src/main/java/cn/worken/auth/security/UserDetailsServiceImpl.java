@@ -44,6 +44,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new ServiceException("该用户不存在!");
         }
         SysCom sysCom = new SysCom().selectById(sysUser.getId());
+        if (sysCom == null) {
+            throw new ServiceException("该组织不存在!");
+        }
         // 校验密码
         if (!passwordEncoder.matches(loginParam.getPassword(), sysUser.getLoginPwd())) {
             throw new ServiceException("账户密码错误，请重新输入!");

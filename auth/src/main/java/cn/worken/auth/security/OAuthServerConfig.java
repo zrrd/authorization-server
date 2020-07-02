@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -115,6 +116,14 @@ public class OAuthServerConfig {
             accessTokenConverter.setAccessTokenConverter(new DefaultAccessTokenConverter() {
                 @Override
                 public Map<String, ?> convertAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
+                    System.out.println(accessTokenConverter);
+                    // password 自定义 jwt token
+                    if (token instanceof DefaultOAuth2AccessToken && authentication.getPrincipal() != null) {
+                        DefaultOAuth2AccessToken oAuth2AccessToken = (DefaultOAuth2AccessToken) token;
+
+                    } else {
+                        // client_credentials 自定义 jwt token
+                    }
                     return super.convertAccessToken(token, authentication);
                 }
             });
