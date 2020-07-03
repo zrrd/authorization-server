@@ -53,12 +53,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         // TODO 用户权限查找 & cache
 
-        // TODO 删除该用户cache
+        // TODO 删除该用户 cache
 
         // 封装前台响应
-        return LoginUserInfo.builder().userId(sysUser.getId()).userName(sysUser.getUserName())
+        LoginUserInfo userInfo = LoginUserInfo.builder().userId(sysUser.getId()).userName(sysUser.getUserName())
             .comId(sysUser.getComId()).companyName(sysCom.getComName()).res(ResTypeDto.emptyRes())
             .build();
+        userInfo.checkSuccess();
+        return userInfo;
     }
 
 }

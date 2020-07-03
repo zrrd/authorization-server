@@ -1,6 +1,8 @@
 package cn.worken.auth.security;
 
 
+import cn.worken.auth.security.dto.LoginUserInfo;
+import cn.worken.auth.security.dto.UserConstants;
 import java.util.Base64;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
@@ -116,15 +118,26 @@ public class OAuthServerConfig {
             accessTokenConverter.setAccessTokenConverter(new DefaultAccessTokenConverter() {
                 @Override
                 public Map<String, ?> convertAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
-                    System.out.println(accessTokenConverter);
+                    Map<String, Object> map = (Map<String, Object>) super.convertAccessToken(token, authentication);
+                    map.remove("user_name");
                     // password 自定义 jwt token
-                    if (token instanceof DefaultOAuth2AccessToken && authentication.getPrincipal() != null) {
+                    if (token instanceof DefaultOAuth2AccessToken && authentication.getPrincipal() != null
+                        && authentication.getPrincipal() instanceof LoginUserInfo) {
                         DefaultOAuth2AccessToken oAuth2AccessToken = (DefaultOAuth2AccessToken) token;
-
+                        LoginUserInfo userInfo = (LoginUserInfo) authentication.getPrincipal();
+                        map.put(UserConstants.USER_ID, userInfo.getUserId());
+                        map.put(UserConstants.USER_TYPE, userInfo.getUserType());
+                        map.put(UserConstants.NAME, userInfo.getUserName());
+                        map.put(UserConstants.COM_ID, userInfo.getComId());
+                        // 自定义 额外参数
+                        Map<String, Object> additionalInformation = oAuth2AccessToken.getAdditionalInformation();
+                        additionalInformation.put("code", userInfo.getCode());
+                        additionalInformation.put("message", userInfo.getMessage());
+                        additionalInformation.put("data", userInfo);
                     } else {
                         // client_credentials 自定义 jwt token
                     }
-                    return super.convertAccessToken(token, authentication);
+                    return map;
                 }
             });
             return accessTokenConverter;

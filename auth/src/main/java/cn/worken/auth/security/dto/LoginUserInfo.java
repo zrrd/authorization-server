@@ -1,5 +1,6 @@
 package cn.worken.auth.security.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,9 +38,25 @@ public class LoginUserInfo {
      * 组织名
      */
     private String companyName;
-
     /**
      * 用户权限列表
      */
     private ResTypeDto res;
+
+    /**
+     * 自定义code
+     */
+    @JsonIgnore
+    private Integer code = 200;
+
+    /**
+     * 自定义响应
+     */
+    @JsonIgnore
+    private String message = "登陆成功";
+
+    public void checkSuccess() {
+        this.code = 200;
+        this.message = "登陆成功";
+    }
 }
