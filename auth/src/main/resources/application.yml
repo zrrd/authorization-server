@@ -31,4 +31,3 @@ management:
         include: "*"
 logging.level.org.springframework.security: DEBUG
 # jwt 加密key
-jwt-secret-key: KmReSFdkIVZYd2VwZjVqaHVYUmIlTXpIcm5HSzgldXM=

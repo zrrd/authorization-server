@@ -3,9 +3,16 @@ package cn.worken.auth.security;
 
 import cn.worken.auth.security.dto.LoginUserInfo;
 import cn.worken.auth.security.dto.UserConstants;
-import java.util.Base64;
+import cn.worken.auth.util.RSAUtils;
+import com.google.common.io.CharStreams;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +33,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.util.ResourceUtils;
 
 /**
  * @author shaoyijiong
@@ -49,7 +57,16 @@ public class OAuthServerConfig {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http
+            http.exceptionHandling(h -> {
+                h.accessDeniedHandler((httpServletRequest, httpServletResponse, e) -> {
+                    System.out.println("aa");
+                    throw e;
+                });
+                h.authenticationEntryPoint((httpServletRequest, httpServletResponse, e) -> {
+                    System.out.println("bb");
+                    throw e;
+                });
+            })
                 .authorizeRequests()
                 .antMatchers("/order/**")
                 .authenticated();//配置order访问控制，必须认证过后才可以访问
@@ -106,14 +123,12 @@ public class OAuthServerConfig {
             oauthServer.allowFormAuthenticationForClients();
         }
 
-        @Value("${jwt-secret-key}")
-        private String stringKey;
 
         @Bean
         public JwtAccessTokenConverter jwtAccessTokenConverter() {
             JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
             // 自定义生成签名的key
-            accessTokenConverter.setSigningKey(new String(Base64.getDecoder().decode(stringKey)));
+            accessTokenConverter.setKeyPair(keyPair());
             // 自定义生成的签名
             accessTokenConverter.setAccessTokenConverter(new DefaultAccessTokenConverter() {
                 @Override
@@ -142,6 +157,19 @@ public class OAuthServerConfig {
             });
             return accessTokenConverter;
         }
+
+        @SneakyThrows
+        @Bean
+        public KeyPair keyPair() {
+            File pubFile = ResourceUtils.getFile("classpath:pub.key");
+            String pubString = CharStreams.toString(new InputStreamReader(new FileInputStream(pubFile)));
+            RSAPublicKey publicKey = RSAUtils.getPublicKey(pubString);
+            File priFile = ResourceUtils.getFile("classpath:pri.key");
+            String priString = CharStreams.toString(new InputStreamReader(new FileInputStream(priFile)));
+            RSAPrivateKey privateKey = RSAUtils.getPrivateKey(priString);
+            return new KeyPair(publicKey, privateKey);
+        }
     }
+
 
 }

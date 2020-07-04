@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.Base64;
 import org.junit.Test;
 
 /**
@@ -10,7 +8,6 @@ public class Go {
 
     @Test
     public void a() {
-        String stringKey = "KmReSFdkIVZYd2VwZjVqaHVYUmIlTXpIcm5HSzgldXM=";
-        System.out.println(new String(Base64.getDecoder().decode(stringKey)));
+
     }
 }
