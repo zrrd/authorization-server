@@ -25,7 +25,8 @@ public class CustomBasicErrorController extends BasicErrorController {
 
     public CustomBasicErrorController(ErrorAttributes errorAttributes,
         ObjectProvider<ErrorViewResolver> errorViewResolvers, ServerProperties serverProperties) {
-        super(errorAttributes, serverProperties.getError(),errorViewResolvers.orderedStream().collect(Collectors.toList()));
+        super(errorAttributes, serverProperties.getError(),
+            errorViewResolvers.orderedStream().collect(Collectors.toList()));
     }
 
     @Override

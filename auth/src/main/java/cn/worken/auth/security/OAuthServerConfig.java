@@ -59,11 +59,9 @@ public class OAuthServerConfig {
         public void configure(HttpSecurity http) throws Exception {
             http.exceptionHandling(h -> {
                 h.accessDeniedHandler((httpServletRequest, httpServletResponse, e) -> {
-                    System.out.println("aa");
                     throw e;
                 });
                 h.authenticationEntryPoint((httpServletRequest, httpServletResponse, e) -> {
-                    System.out.println("bb");
                     throw e;
                 });
             })

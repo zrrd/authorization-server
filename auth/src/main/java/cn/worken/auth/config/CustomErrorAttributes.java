@@ -1,6 +1,6 @@
 package cn.worken.auth.config;
 
-import cn.worken.commons.errors.ServiceException;
+import cn.worken.auth.security.exception.ServiceException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
