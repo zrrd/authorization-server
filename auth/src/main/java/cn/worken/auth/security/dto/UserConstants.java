@@ -24,4 +24,8 @@ public interface UserConstants {
      * 组织id
      */
     String COM_ID = "com_id";
+    /**
+     * 登陆账户
+     */
+    String USER_NAME = "user_name";
 }

@@ -144,6 +144,7 @@ public class OAuthServerConfig {
                         map.put(UserConstants.USER_TYPE, userInfo.getUserType());
                         map.put(UserConstants.NAME, userInfo.getUserName());
                         map.put(UserConstants.COM_ID, userInfo.getComId());
+                        map.put(UserConstants.USER_NAME, userInfo.getLoginName());
                         // 自定义 额外参数
                         Map<String, Object> additionalInformation = oAuth2AccessToken.getAdditionalInformation();
                         additionalInformation.put("code", userInfo.getCode());

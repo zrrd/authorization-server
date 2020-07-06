@@ -70,8 +70,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new ServiceException("账户密码错误，请重新输入!");
         }
         // 封装前台响应
-        LoginUserInfo userInfo = LoginUserInfo.builder().userId(sysUser.getId()).userName(sysUser.getUserName())
-            .comId(sysUser.getComId()).companyName(sysCom.getComName()).build();
+        LoginUserInfo userInfo = LoginUserInfo.builder().userId(sysUser.getId()).loginName(sysUser.getLoginName())
+            .userName(sysUser.getUserName()).comId(sysUser.getComId()).companyName(sysCom.getComName()).build();
         Set<ResDto> res = res(sysUser.getId(), sysUser.getComId(), 1);
         userInfo.setRes(new ResTypeDto(res));
         log.info("用户登陆成功,账户[{}],用户信息[{}]", sysUser.getLoginName(), JSON.toJSONString(userInfo));

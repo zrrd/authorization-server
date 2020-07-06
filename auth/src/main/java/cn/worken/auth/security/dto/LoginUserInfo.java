@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginUserInfo {
 
+    private String loginName;
     /**
      * 用户id
      */
