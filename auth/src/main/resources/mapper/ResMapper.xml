@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.worken.auth.service.mapper.ResMapper">
+
+    <select id="getAllResUnderTheCompany" resultType="cn.worken.auth.security.dto.ResDto">
+        SELECT res_cd,
+               res_type
+        FROM sys_res
+        WHERE `status` = 1
+          AND type = #{resType}
+          AND res_cd NOT IN
+            #得到组织限制的权限
+              (SELECT r.res_cd
+               FROM sys_res r
+                        INNER JOIN sys_res_limit l ON l.com_id = #{comId} AND r.res_cd = l.res_cd)
+    </select>
+
+
+    <select id="getResCd" resultType="java.lang.String">
+        #用户角色对应的资源
+        SELECT r2.to_id AS res_code
+        FROM sys_res_rel r1
+                 INNER JOIN sys_res_rel r2 ON (r1.to_id = r2.from_id AND r2.rel_type = 'ROLE_RES')
+        WHERE r1.rel_type = 'USER_ROLE'
+          AND r1.from_id = #{userId}
+        UNION ALL
+        #用户直接对应的资源
+        SELECT to_id AS res_code
+        FROM sys_res_rel
+        WHERE from_id = #{userId}
+          AND rel_type = 'USER_RES'
+    </select>
+
+
+    <select id="getResCdByCom" resultType="java.lang.String">
+        #用户角色对应的资源
+        SELECT r2.to_id AS res_code
+        FROM sys_res_rel r1
+                 INNER JOIN sys_res_rel r2 ON (r1.to_id = r2.from_id AND r2.rel_type = 'ROLE_RES')
+        WHERE r1.rel_type = 'COM_ROLE'
+          AND r1.from_id = #{comId}
+        UNION ALL
+        #用户直接对应的资源
+        SELECT to_id AS res_code
+        FROM sys_res_rel
+        WHERE from_id = #{comId}
+          AND rel_type = 'COM_RES'
+    </select>
+
+    <select id="getResByResCd" resultType="cn.worken.auth.security.dto.ResDto">
+        SELECT DISTINCT r.res_cd,
+        res_type
+        FROM sys_res r
+        WHERE r.res_cd IN
+        <foreach collection="resCdList" item="resCd" open="(" close=")" separator=",">
+            #{resCd}
+        </foreach>
+    </select>
+</mapper>

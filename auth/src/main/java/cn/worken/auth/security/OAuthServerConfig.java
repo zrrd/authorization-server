@@ -1,8 +1,10 @@
 package cn.worken.auth.security;
 
 
+import cn.worken.auth.security.dto.ClientConstants;
 import cn.worken.auth.security.dto.LoginUserInfo;
 import cn.worken.auth.security.dto.UserConstants;
+import cn.worken.auth.service.dto.CustomClientDetails;
 import cn.worken.auth.util.RSAUtils;
 import com.google.common.io.CharStreams;
 import java.io.File;
@@ -149,6 +151,10 @@ public class OAuthServerConfig {
                         additionalInformation.put("data", userInfo);
                     } else {
                         // client_credentials 自定义 jwt token
+                        String clientId = authentication.getOAuth2Request().getClientId();
+                        CustomClientDetails clientDetails =
+                            (CustomClientDetails) clientDetailsServiceAdapt.loadClientByClientId(clientId);
+                        map.put(ClientConstants.COM_ID, clientDetails.getComId());
                     }
                     return map;
                 }
@@ -156,6 +162,9 @@ public class OAuthServerConfig {
             return accessTokenConverter;
         }
 
+        /**
+         * rsa 密钥对
+         */
         @SneakyThrows
         @Bean
         public KeyPair keyPair() {
