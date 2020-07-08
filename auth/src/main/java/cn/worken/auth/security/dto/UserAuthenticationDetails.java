@@ -1,14 +1,16 @@
 package cn.worken.auth.security.dto;
 
 import java.util.Collections;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.userdetails.User;
 
 /**
  * @author shaoyijiong
  * @date 2020/7/1
  */
-@Data
+@Getter
+@Setter
 public class UserAuthenticationDetails extends User {
 
     private Integer userId;
